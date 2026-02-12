@@ -1,11 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+import { AuthService } from '../../core/services/auth.service';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+  
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   template : `
     <div class="flex flex-col h-screen bg-white dark:bg-slate-900 animate-fade-in relative">
       <!-- Header with Gradient and Logo -->
@@ -34,13 +36,13 @@ import { CommonModule } from '@angular/common';
           <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Sistema de Alta de Seguro Médico</p>
         </div>
 
-        <form class="space-y-5" (submit)="$event.preventDefault(); login()">
+        <form [formGroup]="form" class="space-y-5" (submit)="$event.preventDefault(); login()">
           <!-- Advisor ID Input -->
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 ml-1">ID DE ASESOR</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">badge</span>
-              <input 
+              <input formControlName="userName"
                 type="text" 
                 class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-secondary/50 dark:text-white transition-all outline-none" 
                 placeholder="Ingresa tu ID" 
@@ -49,14 +51,15 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <!-- Password Input -->
-          <div>
+          <div class="form-group">
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 ml-1">CONTRASEÑA</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
               <input 
+                formControlName = "password"
                 [type]="showPassword() ? 'text' : 'password'" 
                 class="w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl focus:ring-2 focus:ring-secondary/50 dark:text-white transition-all outline-none" 
-                placeholder="••••••••" 
+                placeholder="" 
                 value="password">
               <button 
                 type="button"
@@ -115,15 +118,51 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class LoginComponent {
+
+  formBuilder = new FormBuilder();
+
+  form : any;
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      userName: ['', [Validators.required, Validators.minLength(10)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+    });
+
+    // const token = localStorage.getItem('access_token');
+    // if (token) {
+    //   this.router.navigate(['/dashboard']);
+    // }
+  }
+
   showPassword = signal(false);
-  constructor(private router: Router) {}
+  constructor(private fb: FormBuilder, private router: Router, private auth: AuthService) {}
 
   togglePassword(): void {
     this.showPassword.update(v => !v);
   }
 
   login(): void {
-    // Aquí iría la lógica de autenticación real
-    this.router.navigate(['/dashboard']);
+
+    if(this.form.invalid){
+      this.form.markAllAsTouched();
+      return;
+    }
+    
+    const payload = {
+      userName: this.form.value.userName,
+      password : this.form.value.password
+    };
+
+    this.auth.login(payload).subscribe({
+      next: (tokens) => {
+        this.auth.storeToken(tokens);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        console.error('login failed', err);
+        alert('Login failed. Please check your credetials and try again.')
+      }
+    });
   }
 }

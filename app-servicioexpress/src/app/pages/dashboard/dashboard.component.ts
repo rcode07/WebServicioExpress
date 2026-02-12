@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MOCK_CLIENTS } from '../../mocks/constants';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
-
+import { CustomerService } from '../../core/services/customer.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -175,7 +175,18 @@ export class DashboardComponent {
     );
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private customerService: CustomerService) {}
+
+  ngOnInit(): void {
+    this.customerService.getCustomers().subscribe({
+      next: (tokens) => {
+        alert("Clientes satisfactoriamente")
+      },
+      error: (err) => {
+        console.error('login failed', err);
+      }
+    });
+  }
 
   updateSearch(event: Event): void {
     const input = event.target as HTMLInputElement;
