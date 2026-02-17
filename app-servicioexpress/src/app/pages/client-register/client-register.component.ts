@@ -1,11 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { CustomerService } from '../../core/services/customer.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-client-register',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="flex flex-col min-h-screen bg-background-light dark:bg-background-dark animate-fade-in relative">
       <!-- Header -->
@@ -33,7 +35,7 @@ import { CommonModule } from '@angular/common';
 
       <!-- Main Form Area -->
       <main class="flex-1 px-6 -mt-6 relative z-20 pb-4 overflow-y-auto">
-        <form class="space-y-4" (submit)="$event.preventDefault(); submit()">
+        <form [formGroup] = "form" class="space-y-4" (submit)="$event.preventDefault(); submit()">
           <div class="bg-white dark:bg-slate-800 p-6 rounded-[2.5rem] shadow-xl space-y-5 border border-white dark:border-slate-700">
             
             <!-- NSS Input -->
@@ -41,7 +43,8 @@ import { CommonModule } from '@angular/common';
               <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest" for="nss">Número de Seguridad Social (NSS)</label>
               <div class="relative group">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">badge</span>
-                <input 
+                <input
+                  formControlName="nss"
                   class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
                   id="nss" 
                   placeholder="0000 00 0000 0" 
@@ -55,6 +58,7 @@ import { CommonModule } from '@angular/common';
               <div class="relative group">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">fingerprint</span>
                 <input 
+                  formControlName="curp"
                   class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all uppercase outline-none text-sm font-medium" 
                   id="curp" 
                   placeholder="ABCD000000XXXXXX00" 
@@ -68,6 +72,7 @@ import { CommonModule } from '@angular/common';
               <div class="relative group">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">person</span>
                 <input 
+                  formControlName="name"
                   class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
                   id="name" 
                   placeholder="Juan Pérez López" 
@@ -81,6 +86,7 @@ import { CommonModule } from '@angular/common';
               <div class="relative group">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">phone_iphone</span>
                 <input 
+                  formControlName="phone"
                   class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
                   id="phone" 
                   placeholder="449 000 0000" 
@@ -154,8 +160,13 @@ import { CommonModule } from '@angular/common';
       <!-- Sticky Footer Actions & Navigation -->
       <footer class="sticky bottom-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-t-[3rem] shadow-[0_-15px_40px_rgba(0,0,0,0.1)] px-6 py-6 pb-12 z-[100] max-w-md mx-auto w-full">
         <button (click)="submit()" class="w-full bg-secondary hover:bg-yellow-400 text-primary font-black text-lg py-5 rounded-2xl shadow-xl shadow-secondary/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest">
+          @if (isLoading()) {
+          <span class="material-symbols-outlined animate-spin">progress_activity</span>
+          <span>Procesando...</span>
+        } @else {
           <span>Registrar Cliente</span>
           <span class="material-symbols-outlined font-black">arrow_forward</span>
+        }
         </button>
 
         <nav class="mt-8 flex justify-around items-center">
@@ -181,6 +192,15 @@ import { CommonModule } from '@angular/common';
       <!-- iOS Home Indicator -->
       <div class="fixed bottom-2 left-1/2 -translate-x-1/2 h-1.5 w-32 bg-slate-200 dark:bg-slate-700 rounded-full z-[110]"></div>
     </div>
+
+    @if (isLoading()) {
+    <div class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-primary/20 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center space-y-4">
+        <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        <p class="text-primary font-black uppercase tracking-widest text-xs">Guardando datos...</p>
+      </div>
+    </div>
+  }
   `,
   styles: [`
     .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -189,33 +209,96 @@ import { CommonModule } from '@angular/common';
     ::-webkit-scrollbar { display: none; }
     
     input::placeholder { color: #94a3b8; font-weight: 500; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
   `]
 })
 export class ClientRegisterComponent {
+
+  isLoading = signal(false);
+
   // Estado de los archivos subidos usando Signals
-  files = signal<{ semanas: string | null; vigencia: string | null }>({
+  files = signal<{ semanas: File | null; vigencia: File | null }>({
     semanas: null,
     vigencia: null
   });
 
-  constructor(private router: Router) {}
+  formBuilder = new FormBuilder();
+  form : any;
+
+  constructor(private router: Router, private service: CustomerService, private fb: FormBuilder) {}
   
   back(): void {
     this.router.navigate(['/dashboard']);
   }
 
   onFileSelected(event: any, type: 'semanas' | 'vigencia'): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.files.update(current => ({
-        ...current,
-        [type]: file.name
-      }));
-    }
+  const file = event.target.files[0];
+
+  if (file) {
+    this.files.update(current => ({
+      ...current,
+      [type]: file
+    }));
   }
+}
+
+ngOnInit(): void{
+  this.form = this.fb.group({
+    nss: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+    curp: ['', [Validators.required, Validators.minLength(18), Validators.maxLength(18)]],
+    phone: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
+    name: ['', [Validators.required]],
+  });
+}
+
   
   submit(): void {
-    // Simulación de proceso de guardado
-    this.router.navigate(['/confirmation']);
+    const idConsultant = localStorage.getItem('user_id');
+
+    if(idConsultant == null){
+      alert("Error, cierre sesión y vuelva a entrar");
+      return;
+    }
+
+    if(this.form.invalid){
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    const nss = this.form.value.nss;
+    const curp = this.form.value.curp;
+    const phone = this.form.value.phone;
+    const name = this.form.value.name;
+
+    const filesValue = this.files();
+
+    if (!filesValue.semanas || !filesValue.vigencia) {
+      console.error('Faltan archivos');
+      return;
+    }
+
+    this.service.create(idConsultant, nss, curp, phone, name, filesValue.semanas, filesValue.vigencia).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+
+        const customer = response.object;
+
+        this.router.navigate(['/confirmation'], {state: {customer}});
+      },
+      error : (err) => {
+        this.isLoading.set(false);
+        alert("Error al crear al cliente, favor de intentarlo de nuevo");
+      }
+    });
+    
   }
 }

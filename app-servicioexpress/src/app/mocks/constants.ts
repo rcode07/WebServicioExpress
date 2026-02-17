@@ -5,7 +5,7 @@ import { Document } from "../models/DocumentModel";
 
 export const MOCK_CLIENTS: Client[] = [
   {
-    id: '1',
+    id: '7',
     name: 'Ricardo Ramirez',
     initials: 'RR',
     serviceType: 'Semanas SISEC',
@@ -18,7 +18,7 @@ export const MOCK_CLIENTS: Client[] = [
     policyType: 'GMM Familiar Plus'
   },
   {
-    id: '2',
+    id: '6',
     name: 'Maria Alcaraz',
     initials: 'MA',
     serviceType: 'Servicios SAT',
@@ -31,7 +31,7 @@ export const MOCK_CLIENTS: Client[] = [
     policyType: 'Plan Médico Platino'
   },
   {
-    id: '3',
+    id: '5',
     name: 'Juan Sanchez',
     initials: 'JS',
     serviceType: 'Trámite SINDOS',

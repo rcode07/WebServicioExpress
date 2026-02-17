@@ -128,11 +128,6 @@ export class LoginComponent {
       userName: ['', [Validators.required, Validators.minLength(10)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
-
-    // const token = localStorage.getItem('access_token');
-    // if (token) {
-    //   this.router.navigate(['/dashboard']);
-    // }
   }
 
   showPassword = signal(false);
@@ -155,8 +150,11 @@ export class LoginComponent {
     };
 
     this.auth.login(payload).subscribe({
-      next: (tokens) => {
-        this.auth.storeToken(tokens);
+      next: (authResponse) => {
+        this.auth.storeToken('access_token', authResponse.authResponse.token);
+        this.auth.storeToken('user_name', authResponse.authResponse.user.name);
+        this.auth.storeToken('user_id', authResponse.authResponse.user.id);
+        this.auth.storeToken('user_phone', authResponse.authResponse.user.phone);
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

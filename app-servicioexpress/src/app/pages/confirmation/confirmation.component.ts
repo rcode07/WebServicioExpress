@@ -52,18 +52,18 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
               </div>
               <div>
                 <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-0.5">Cliente Registrado</p>
-                <p class="text-slate-900 dark:text-white text-xl font-black leading-tight">Juan Pérez García</p>
+                <p class="text-slate-900 dark:text-white text-xl font-black leading-tight">{{ customer()?.name }}</p>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-6">
               <div class="flex flex-col gap-1">
                 <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">CURP</p>
-                <p class="text-slate-900 dark:text-white text-sm font-mono font-bold tracking-tighter">PEGJ800101HDFRRN01</p>
+                <p class="text-slate-900 dark:text-white text-sm font-mono font-bold tracking-tighter">{{ customer()?.curp }}</p>
               </div>
               <div class="flex flex-col gap-1">
                 <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Folio Asignado</p>
-                <p class="text-primary font-black text-sm">#S-449-0824</p>
+                <p class="text-primary font-black text-sm">#{{ customer()?.id }}</p>
               </div>
             </div>
 
@@ -71,7 +71,7 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
               <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Tipo de Póliza</p>
               <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl">
                 <span class="material-symbols-outlined text-primary text-xl fill-1">verified_user</span>
-                <p class="text-slate-900 dark:text-white text-sm font-black tracking-tight">GMM Familiar Plus</p>
+                <p class="text-slate-900 dark:text-white text-sm font-black tracking-tight">IMSS</p>
               </div>
             </div>
           </div>
@@ -115,7 +115,17 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
   `]
 })
 export class ConfirmationComponent {
-  constructor(private router: Router) {}
+
+  customer = signal<any>(null);
+
+  constructor(private router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    const stateCustomer = navigation?.extras?.state?.['customer'];
+
+    if (stateCustomer) {
+      this.customer.set(stateCustomer);
+    }
+  }
 
   goToDashboard(): void {
     this.router.navigate(['/dashboard']);

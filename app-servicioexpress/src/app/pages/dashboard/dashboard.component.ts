@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MOCK_CLIENTS } from '../../mocks/constants';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { CustomerService } from '../../core/services/customer.service';
+import { Client } from '../../models/ClientModel';
 
 @Component({
   selector: 'app-dashboard',
@@ -158,7 +159,9 @@ import { CustomerService } from '../../core/services/customer.service';
 })
 export class DashboardComponent {
   // Lista original de clientes
-  private allClients = signal(MOCK_CLIENTS);
+  //private allClients = signal(MOCK_CLIENTS);
+
+  private allClients = signal<Client[]>([]);
   
   // Término de búsqueda reactivo
   searchTerm = signal('');
@@ -178,9 +181,9 @@ export class DashboardComponent {
   constructor(private router: Router, private customerService: CustomerService) {}
 
   ngOnInit(): void {
-    this.customerService.getCustomers().subscribe({
-      next: (tokens) => {
-        alert("Clientes satisfactoriamente")
+    this.customerService.getCustomers(localStorage.getItem('user_id') || '').subscribe({
+      next: (clients) => {
+        this.allClients.set(clients);
       },
       error: (err) => {
         console.error('login failed', err);
@@ -194,6 +197,7 @@ export class DashboardComponent {
   }
 
   goToDetail(id: string): void {
+    console.log('Navigating to client detail with ID:', id);
     this.router.navigate(['/client-detail', id]);
   }
 }

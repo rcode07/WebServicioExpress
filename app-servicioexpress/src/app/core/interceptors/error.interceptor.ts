@@ -13,6 +13,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401) {
         // 1. Borramos el token vencido (limpieza)
         localStorage.removeItem('access_token'); 
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('user_phone');
         
         // 2. Redirigimos al login
         router.navigate(['/login']);
