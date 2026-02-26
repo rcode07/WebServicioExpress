@@ -4,8 +4,9 @@ import { CommonModule } from '@angular/common';
 import { MOCK_CLIENTS, MOCK_DOCUMENTS, MOCK_STEPS } from '../../mocks/constants';
 import { Client } from '../../models/ClientModel';
 import { EnrollmentStep } from '../../models/EnrollmentStepModel';
-import { Document } from '../../models/DocumentModel';
+import { Documentx } from '../../models/DocumentModel';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
+import { ServiceService } from '../../core/services/service.service';
 
 @Component({
   selector: 'app-client-detail',
@@ -113,9 +114,13 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Subido {{ doc.date }} • {{ doc.size }}</p>
                   </div>
                 </div>
-                <button class="text-slate-300">
+                <a 
+                  [href]="doc.url" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="text-slate-300 hover:text-blue-500 transition-colors flex items-center">
                   <span class="material-symbols-outlined">visibility</span>
-                </button>
+                </a>
               </div>
             }
 
@@ -153,19 +158,79 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
 })
 export class ClientDetailComponent {
   client = signal<Client | undefined>(undefined);
-  steps = signal<EnrollmentStep[]>(MOCK_STEPS);
-  documents = signal<Document[]>(MOCK_DOCUMENTS);
+  steps = signal<EnrollmentStep[] | undefined>(undefined);
+  documents = signal<Documentx[] | undefined>(undefined);
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private serviceService: ServiceService) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    const foundClient = MOCK_CLIENTS.find(c => c.id === id);
-    if (foundClient) {
-      this.client.set(foundClient);
-    } else {
+
+    if(id == null){
+      alert('Servicio no encontrado');
       this.back();
+      return;
     }
+
+    this.serviceService.getHistroricalById(id).subscribe({
+      next: (response) => {
+        if(response.message && response.object){
+
+          const mapped: EnrollmentStep[] = response.object.history.map((item: any) => ({
+            id: String(item.id),
+            title: item.title,
+            description: item.description,
+            status: item.status as 'completed' | 'current' | 'pending',
+            date: item.date || undefined
+          }));
+
+          const customerMapped : Client = {
+            id: response.object.customer.id,
+            name: response.object.customer.name,
+            initials: response.object.customer.initials,
+            serviceType: response.object.customer.serviceType,
+            folio: response.object.customer.folio,
+            status: response.object.customer.status,
+            date: response.object.customer.date,
+            nss: response.object.customer.nss,
+            curp: response.object.customer.curp,
+            phone: response.object.customer.phone,
+            policyType: response.object.customer.policyType
+          };
+
+          const docSemanasCotizadas: Documentx = {
+            id: '1',
+            name: 'Semanas Cotizadas.pdf',
+            date: '',
+            size: '',
+            type: 'application/pdf',
+            url:  response.object.customer.urlSemanasCotizadas
+          };
+
+          const docSemanasDerechos: Documentx = {
+            id: '1',
+            name: 'Semanas Cotizadas.pdf',
+            date: '',
+            size: '',
+            type: 'application/pdf',
+            url:  response.object.customer.urlVigenciaDerechos
+          };
+
+          console.log('Mapped Documents:', docSemanasCotizadas, docSemanasDerechos);
+
+          const documents = [docSemanasCotizadas, docSemanasDerechos];
+          
+          this.documents.set(documents);
+          this.steps.set(mapped); 
+          this.client.set(customerMapped);
+        }
+      },
+      error: (err) => {
+        alert('Error al obtener el historial del cliente');
+      }
+    });
+
+    
   }
 
   back() {

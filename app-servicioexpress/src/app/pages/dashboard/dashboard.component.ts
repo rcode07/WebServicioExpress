@@ -44,7 +44,7 @@ import { Client } from '../../models/ClientModel';
             <div class="bg-primary p-5 rounded-[2rem] text-white shadow-xl shadow-primary/20 col-span-2 flex items-center justify-between overflow-hidden relative group">
               <div class="z-10 relative">
                 <p class="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Total de Trámites</p>
-                <h3 class="text-5xl font-black mt-1 tracking-tighter">128</h3>
+                <h3 class="text-5xl font-black mt-1 tracking-tighter">2</h3>
                 <div class="mt-3 inline-flex items-center gap-1.5 bg-secondary text-deep-blue px-3 py-1 rounded-full text-[10px] font-black uppercase">
                   +12% <span class="material-symbols-outlined text-xs">trending_up</span>
                 </div>
@@ -58,7 +58,7 @@ import { Client } from '../../models/ClientModel';
                 <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Completados</p>
               </div>
-              <h3 class="text-2xl font-bold dark:text-white">84</h3>
+              <h3 class="text-2xl font-bold dark:text-white">1</h3>
             </div>
             
             <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
@@ -66,7 +66,7 @@ import { Client } from '../../models/ClientModel';
                 <div class="w-2 h-2 rounded-full bg-amber-400"></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">En Proceso</p>
               </div>
-              <h3 class="text-2xl font-bold dark:text-white">32</h3>
+              <h3 class="text-2xl font-bold dark:text-white">1</h3>
             </div>
           </div>
         </section>
@@ -197,7 +197,6 @@ export class DashboardComponent {
   }
 
   goToDetail(id: string): void {
-    console.log('Navigating to client detail with ID:', id);
     this.router.navigate(['/client-detail', id]);
   }
 }

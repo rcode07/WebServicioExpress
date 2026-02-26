@@ -1,11 +1,11 @@
 import { Client } from "../models/ClientModel";
 import { EnrollmentStep } from "../models/EnrollmentStepModel";
-import { Document } from "../models/DocumentModel";
+import { Documentx } from "../models/DocumentModel";
 
 
 export const MOCK_CLIENTS: Client[] = [
   {
-    id: '7',
+    id: '15',
     name: 'Ricardo Ramirez',
     initials: 'RR',
     serviceType: 'Semanas SISEC',
@@ -56,20 +56,22 @@ export const MOCK_CLIENTS: Client[] = [
   }
 ];
 
-export const MOCK_DOCUMENTS: Document[] = [
+export const MOCK_DOCUMENTS: Documentx[] = [
   {
     id: 'd1',
     name: 'Semanas Cotizadas.pdf',
     date: '12 Oct',
     size: '1.2 MB',
-    type: 'pdf'
+    type: 'pdf',
+    url: 'https://drive.google.com/file/d/1PHB39DcvM6zIEsrjVnOTVSiERGMSaDYp/view?usp=drivesdk'
   },
   {
     id: 'd2',
     name: 'Vigencia de Derechos.pdf',
     date: '12 Oct',
     size: '0.8 MB',
-    type: 'pdf'
+    type: 'pdf',
+    url: 'https://drive.google.com/file/d/1PHB39DcvM6zIEsrjVnOTVSiERGMSaDYp/view?usp=drivesdk'
   }
 ];
 
@@ -85,11 +87,11 @@ export const MOCK_STEPS: EnrollmentStep[] = [
     id: 's2',
     title: 'Validación de Documentos',
     description: 'En progreso - Revisando archivos',
-    status: 'current'
+    status: 'current',
   },
   {
     id: 's3',
-    title: 'Revisión Médica',
+    title: 'En Proceso de alta',
     description: 'Pendiente',
     status: 'pending'
   },

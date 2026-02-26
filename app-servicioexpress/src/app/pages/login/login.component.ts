@@ -102,6 +102,15 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
       <!-- iOS Home Indicator -->
       <div class="h-1.5 w-32 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-2 shrink-0"></div>
     </div>
+
+    @if (isLoading()) {
+    <div class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-primary/20 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center space-y-4">
+        <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        <p class="text-primary font-black uppercase tracking-widest text-xs">Ingresando...</p>
+      </div>
+    </div>
+  }
   `,
   styles: [`
     .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -118,6 +127,8 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
   `]
 })
 export class LoginComponent {
+
+  isLoading = signal(false);
 
   formBuilder = new FormBuilder();
 
@@ -139,6 +150,8 @@ export class LoginComponent {
 
   login(): void {
 
+    this.isLoading.set(true);
+
     if(this.form.invalid){
       this.form.markAllAsTouched();
       return;
@@ -151,6 +164,9 @@ export class LoginComponent {
 
     this.auth.login(payload).subscribe({
       next: (authResponse) => {
+
+        this.isLoading.set(false);
+
         this.auth.storeToken('access_token', authResponse.authResponse.token);
         this.auth.storeToken('user_name', authResponse.authResponse.user.name);
         this.auth.storeToken('user_id', authResponse.authResponse.user.id);
@@ -158,6 +174,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
+        this.isLoading.set(false);
         console.error('login failed', err);
         alert('Login failed. Please check your credetials and try again.')
       }

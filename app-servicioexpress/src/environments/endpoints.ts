@@ -7,5 +7,8 @@ export const EndPoints = {
     },
     user: {
         login: `${environment.apiBaseUrl}/User/login`,
-        }
+    },
+    service: {
+        getById : `${environment.apiBaseUrl}/Service/historical`,
+    }
 };
