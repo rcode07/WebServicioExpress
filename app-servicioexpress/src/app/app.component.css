@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  overflow: hidden;
+}
+
+.ios-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.material-symbols-outlined {
+  user-select: none;
+}
+
+/* Animaciones suaves para cambios de vista */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+main, .h-screen {
+  animation: fadeIn 0.3s ease-out;
+}
+
+input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 71, 171, 0.2);
+}
+
+button:active {
+  transform: scale(0.97);
+}
