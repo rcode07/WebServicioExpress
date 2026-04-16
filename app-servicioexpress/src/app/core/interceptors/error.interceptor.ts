@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, LOCALE_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
@@ -16,6 +16,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         localStorage.removeItem('user_name');
         localStorage.removeItem('user_id');
         localStorage.removeItem('user_phone');
+        localStorage.removeItem('user_role');
         
         // 2. Redirigimos al login
         router.navigate(['/login']);

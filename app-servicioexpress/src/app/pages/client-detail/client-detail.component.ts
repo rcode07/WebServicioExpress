@@ -7,6 +7,7 @@ import { EnrollmentStep } from '../../models/EnrollmentStepModel';
 import { Documentx } from '../../models/DocumentModel';
 import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.component';
 import { ServiceService } from '../../core/services/service.service';
+import { CustomerService } from '../../core/services/customer.service';
 
 @Component({
   selector: 'app-client-detail',
@@ -124,15 +125,25 @@ import { ServiceService } from '../../core/services/service.service';
               </div>
             }
 
-            <button class="w-full flex items-center justify-center gap-2 p-4 mt-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 font-black text-[11px] uppercase tracking-widest hover:text-primary hover:border-primary/50 transition-all active:scale-[0.98]">
-              <span class="material-symbols-outlined">upload_file</span>
-              Adjuntar nuevo documento
-            </button>
+            @if(client()?.status === 'PENDIENTE PAGO ALTA') {
+              <label class="relative w-full flex flex-col items-center justify-center gap-2 p-8 mt-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 font-black text-[11px] uppercase tracking-widest hover:text-primary hover:border-primary/50 transition-all active:scale-[0.98] cursor-pointer">
+                <span class="material-symbols-outlined text-2xl">upload_file</span>
+                
+                <span>Adjuntar Ticket de Pago</span>
+
+                <input type="file" class="hidden" (change)="onFileSelected($event, 'ticketPagoAlta')" />
+              </label>
+
+              <button (click)="saveTicketPagoAlta()" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20">
+                <span class="material-symbols-outlined">inbox_text_person</span>
+                <span>Enviar ticket Pago</span>
+              </button>
+            }
           </div>
         </div>
 
         <!-- Action Required Alert Card -->
-        <div class="mx-6 mt-6 p-5 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-start gap-4 shadow-sm shadow-secondary/5 mb-10">
+        <!-- <div class="mx-6 mt-6 p-5 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-start gap-4 shadow-sm shadow-secondary/5 mb-10">
           <span class="material-symbols-outlined text-secondary fill-1 mt-0.5">info</span>
           <div>
             <p class="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">Acción requerida</p>
@@ -140,7 +151,7 @@ import { ServiceService } from '../../core/services/service.service';
               La validación de documentos está demorando más de lo habitual. Favor de verificar si existe algún correo de seguimiento o contactar a soporte técnico.
             </p>
           </div>
-        </div>
+        </div> -->
       </main>
 
       <!-- Bottom Nav Bar -->
@@ -149,6 +160,14 @@ import { ServiceService } from '../../core/services/service.service';
       <!-- iOS Home Indicator -->
       <div class="fixed bottom-2 left-1/2 -translate-x-1/2 h-1.5 w-32 bg-slate-200 dark:bg-slate-700 rounded-full z-[110]"></div>
     </div>
+    @if (isLoading()) {
+      <div class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-primary/20 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center space-y-4">
+          <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+          <p class="text-primary font-black uppercase tracking-widest text-xs">Guardando datos...</p>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -160,8 +179,9 @@ export class ClientDetailComponent {
   client = signal<Client | undefined>(undefined);
   steps = signal<EnrollmentStep[] | undefined>(undefined);
   documents = signal<Documentx[] | undefined>(undefined);
+  isLoading = signal(false);
 
-  constructor(private route: ActivatedRoute, private router: Router, private serviceService: ServiceService) {}
+  constructor(private route: ActivatedRoute, private router: Router, private serviceService: ServiceService, private customerService: CustomerService) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -216,9 +236,16 @@ export class ClientDetailComponent {
             url:  response.object.customer.urlVigenciaDerechos
           };
 
-          console.log('Mapped Documents:', docSemanasCotizadas, docSemanasDerechos);
+          const docidse: Documentx = {
+            id: '1',
+            name: 'IDSE.pdf',
+            date: '',
+            size: '',
+            type: 'application/pdf',
+            url:  response.object.customer.urlIDSE
+          };
 
-          const documents = [docSemanasCotizadas, docSemanasDerechos];
+          const documents = [docSemanasCotizadas, docSemanasDerechos, docidse];
           
           this.documents.set(documents);
           this.steps.set(mapped); 
@@ -231,6 +258,47 @@ export class ClientDetailComponent {
     });
 
     
+  }
+
+  saveTicketPagoAlta() {
+    const file = this.files().ticketPagoAlta;
+
+    if (!file) {
+      alert('Por favor, selecciona un archivo antes de enviar.');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.customerService.saveTicketPagoAlta(this.client()?.id || '', file).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+        if(response.message){
+          alert('Ticket de pago enviado correctamente');
+        }
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        alert('Error al enviar el ticket de pago');
+      }
+    });
+    
+  }
+
+  files = signal<{ idse: File | null; ticketPagoAlta: File | null }>({
+    idse: null,
+    ticketPagoAlta: null
+  });
+
+  onFileSelected(event: any, type: 'idse' | 'ticketPagoAlta'): void {
+    const file = event.target.files[0];
+
+    if (file) {
+      this.files.update(current => ({
+        ...current,
+        [type]: file
+      }));
+    }
   }
 
   back() {

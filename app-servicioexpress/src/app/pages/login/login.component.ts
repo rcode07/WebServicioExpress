@@ -170,8 +170,14 @@ export class LoginComponent {
         this.auth.storeToken('access_token', authResponse.authResponse.token);
         this.auth.storeToken('user_name', authResponse.authResponse.user.name);
         this.auth.storeToken('user_id', authResponse.authResponse.user.id);
-        this.auth.storeToken('user_phone', authResponse.authResponse.user.phone);
-        this.router.navigate(['/dashboard']);
+        this.auth.storeToken('user_role', authResponse.authResponse.rol);
+        if(authResponse.authResponse.rol === 'ASESOR'){
+          this.router.navigate(['/dashboard']);
+        }
+        if(authResponse.authResponse.rol === 'SECRETARIA'){
+          this.router.navigate(['/dashboard-admin']);
+        }
+        
       },
       error: (err) => {
         this.isLoading.set(false);

@@ -5,6 +5,9 @@ import { ClientRegisterComponent } from './pages/client-register/client-register
 import { ClientDetailComponent } from './pages/client-detail/client-detail.component';
 import { ConfirmationComponent } from './pages/confirmation/confirmation.component';
 import { authGuard } from './core/guards/auth.guard';
+import { DashboardAdminComponent } from './pages/dashboard-admin/dashboard-admin.component';
+import { ClientEditComponent } from './pages/client-edit/client-edit.component';
+import { ConfirmationSaveCustomerComponent } from './pages/confirmation-save-customer/confirmation-save-customer.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -12,5 +15,9 @@ export const routes: Routes = [
     { path: 'dashboard', component: DashboardComponent, title: 'Panel de control', canActivate : [authGuard] },
     { path: 'register', component: ClientRegisterComponent, title: 'Registrar nuevo cliente', canActivate : [authGuard] },
     { path: 'client-detail/:id', component: ClientDetailComponent, title: 'Detalle del cliente', canActivate : [authGuard] },
+    { path: 'client-edit/:id', component: ClientEditComponent, title: 'Editar cliente', canActivate : [authGuard] },
     { path: 'confirmation', component: ConfirmationComponent, title: 'Registro exitoso', canActivate : [authGuard] },
+    { path: 'confirmation-client', component: ConfirmationSaveCustomerComponent, title: 'Registro exitoso', canActivate : [authGuard] },
+    { path: 'dashboard-admin', component : DashboardAdminComponent, title: 'Panel de control - Admin', canActivate : [authGuard] }
+
 ];
