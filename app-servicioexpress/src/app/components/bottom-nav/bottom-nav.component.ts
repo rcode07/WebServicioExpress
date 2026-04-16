@@ -18,9 +18,9 @@ import { CommonModule } from '@angular/common';
           <span class="material-symbols-outlined text-4xl">add</span>
         </button>
         
-        <button class="flex flex-col items-center gap-1 text-slate-300">
-          <span class="material-symbols-outlined">settings</span>
-          <span class="text-[9px] font-bold uppercase">Ajustes</span>
+        <button (click)="logout()" class="flex flex-col items-center gap-1 text-slate-300">
+          <span class="material-symbols-outlined">logout</span>
+          <span class="text-[9px] font-bold uppercase">Cerrar sesión</span>
         </button>
       </div>
     </nav>
@@ -31,5 +31,14 @@ export class BottomNavComponent {
   constructor(private router: Router) { }
   navigate(path: string) {
     this.router.navigate([path]);
+  }
+
+  logout() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_phone');
+    localStorage.removeItem('user_role');
+    this.router.navigate(['/login']);
   }
 }
