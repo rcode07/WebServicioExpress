@@ -44,7 +44,7 @@ import { Client } from '../../models/ClientModel';
             <div class="bg-primary p-5 rounded-[2rem] text-white shadow-xl shadow-primary/20 col-span-2 flex items-center justify-between overflow-hidden relative group">
               <div class="z-10 relative">
                 <p class="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Total de Trámites</p>
-                <h3 class="text-5xl font-black mt-1 tracking-tighter">2</h3>
+                <h3 class="text-5xl font-black mt-1 tracking-tighter">{{ servicesTotal() }}</h3>
                 <div class="mt-3 inline-flex items-center gap-1.5 bg-secondary text-deep-blue px-3 py-1 rounded-full text-[10px] font-black uppercase">
                   +12% <span class="material-symbols-outlined text-xs">trending_up</span>
                 </div>
@@ -56,17 +56,33 @@ import { Client } from '../../models/ClientModel';
             <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
               <div class="flex items-center gap-2 mb-2">
                 <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Completados</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Activos</p>
               </div>
-              <h3 class="text-2xl font-bold dark:text-white">1</h3>
+              <h3 class="text-2xl font-bold dark:text-white">{{ servicesActives() }}</h3>
             </div>
             
             <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
               <div class="flex items-center gap-2 mb-2">
-                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                <div class="w-2 h-2 rounded-full bg-blue-400"></div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">En Proceso</p>
               </div>
-              <h3 class="text-2xl font-bold dark:text-white">1</h3>
+              <h3 class="text-2xl font-bold dark:text-white">{{ servicesInProcess() }}</h3>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Pendiente</p>
+              </div>
+              <h3 class="text-2xl font-bold dark:text-white">{{ servicesPending() }}</h3>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Inactivos</p>
+              </div>
+              <h3 class="text-2xl font-bold dark:text-white">{{ servicesNoActives() }}</h3>
             </div>
           </div>
         </section>
@@ -97,9 +113,10 @@ import { Client } from '../../models/ClientModel';
                 <div class="flex items-center gap-4">
                   <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-sm shadow-inner" 
                     [ngClass]="{
-                      'bg-blue-50 text-primary dark:bg-primary/20': client.status === 'COMPLETADO',
-                      'bg-amber-50 text-amber-600 dark:bg-amber-900/20': client.status === 'EN PROCESO',
-                      'bg-red-50 text-red-600 dark:bg-red-900/20': client.status === 'PENDIENTE'
+                      'bg-green-50 text-green-600 dark:bg-green-900/20': client.status === 'ACTIVO',
+                      'bg-blue-50 text-blue-600 dark:bg-blue-900/20': client.status === 'EN PROCESO',
+                      'bg-red-50 text-red-600 dark:bg-red-900/20': client.status === 'INACTIVO',
+                      'bg-amber-50 text-amber-600 dark:bg-amber-900/20': client.status === 'PENDIENTE'
                     }">
                     {{ client.initials }}
                   </div>
@@ -111,9 +128,10 @@ import { Client } from '../../models/ClientModel';
                 <div class="text-right">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter"
                     [ngClass]="{
-                      'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400': client.status === 'COMPLETADO',
-                      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400': client.status === 'EN PROCESO',
-                      'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400': client.status === 'PENDIENTE'
+                      'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400': client.status === 'ACTIVO',
+                      'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400': client.status === 'EN PROCESO',
+                      'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400': client.status === 'INACTIVO',
+                      'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400': client.status === 'PENDIENTE'
                     }">
                     {{ client.status }}
                   </span>
@@ -158,10 +176,13 @@ import { Client } from '../../models/ClientModel';
     ::-webkit-scrollbar { display: none; }`]
 })
 export class DashboardComponent {
-  // Lista original de clientes
-  //private allClients = signal(MOCK_CLIENTS);
 
   private allClients = signal<Client[]>([]);
+  public servicesActives = signal(0);
+  public servicesNoActives = signal(0);
+  public servicesInProcess = signal(0);
+  public servicesPending = signal(0);
+  public servicesTotal = signal(0);
   
   // Término de búsqueda reactivo
   searchTerm = signal('');
@@ -184,6 +205,15 @@ export class DashboardComponent {
     this.customerService.getCustomers(localStorage.getItem('user_id') || '').subscribe({
       next: (clients) => {
         this.allClients.set(clients);
+        this.customerService.getResume(localStorage.getItem('user_id') || '').subscribe({
+          next: (resume) => {
+            this.servicesActives.set(resume.object.servicesActive || 0);
+            this.servicesNoActives.set(resume.object.servicesNoActive || 0);
+            this.servicesInProcess.set(resume.object.servicesInProcess || 0);
+            this.servicesPending.set(resume.object.servicesPending || 0);
+            this.servicesTotal.set(resume.object.total || 0);
+          }
+        });
       },
       error: (err) => {
         console.error('login failed', err);

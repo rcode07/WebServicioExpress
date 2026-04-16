@@ -40,31 +40,43 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
             
             <!-- NSS Input -->
             <div class="space-y-1.5">
-              <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest" for="nss">Número de Seguridad Social (NSS)</label>
-              <div class="relative group">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">badge</span>
-                <input
-                  formControlName="nss"
-                  class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
-                  id="nss" 
-                  placeholder="0000 00 0000 0" 
-                  type="text">
-              </div>
+            <div class="flex justify-between items-end px-2">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest" for="nss">NSS</label>
+              <span class="text-[10px] font-bold" [ngClass]="form.get('nss')?.value?.length === 11 ? 'text-green-500' : 'text-slate-400'">
+                {{ form.get('nss')?.value?.length || 0 }}/11
+              </span>
             </div>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">badge</span>
+              <input
+                maxlength="11"
+                formControlName="nss"
+                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
+                id="nss" 
+                placeholder="0000 00 0000 0" 
+                type="text">
+            </div>
+          </div>
 
             <!-- CURP Input -->
             <div class="space-y-1.5">
-              <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest" for="curp">CURP</label>
-              <div class="relative group">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">fingerprint</span>
-                <input 
-                  formControlName="curp"
-                  class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all uppercase outline-none text-sm font-medium" 
-                  id="curp" 
-                  placeholder="ABCD000000XXXXXX00" 
-                  type="text">
-              </div>
+            <div class="flex justify-between items-end px-2">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest" for="curp">CURP</label>
+              <span class="text-[10px] font-bold" [ngClass]="form.get('curp')?.value?.length === 18 ? 'text-green-500' : 'text-slate-400'">
+                {{ form.get('curp')?.value?.length || 0 }}/18
+              </span>
             </div>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">fingerprint</span>
+              <input 
+                maxlength="18"
+                formControlName="curp"
+                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all uppercase outline-none text-sm font-medium" 
+                id="curp" 
+                placeholder="ABCD000000XXXXXX00" 
+                type="text">
+            </div>
+          </div>
 
             <!-- Name Input -->
             <div class="space-y-1.5">
@@ -82,18 +94,23 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
             <!-- Phone Input -->
             <div class="space-y-1.5 pb-2">
-              <label class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest" for="phone">Teléfono de Contacto</label>
-              <div class="relative group">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">phone_iphone</span>
-                <input 
-                  formControlName="phone"
-                  class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
-                  id="phone" 
-                  placeholder="449 000 0000" 
-                  type="tel">
-              </div>
+            <div class="flex justify-between items-end px-2">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest" for="phone">Teléfono</label>
+              <span class="text-[10px] font-bold" [ngClass]="form.get('phone')?.value?.length === 10 ? 'text-green-500' : 'text-slate-400'">
+                {{ form.get('phone')?.value?.length || 0 }}/10
+              </span>
             </div>
-
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">phone_iphone</span>
+              <input 
+                maxlength="10"
+                formControlName="phone"
+                class="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium" 
+                id="phone" 
+                placeholder="449 000 0000" 
+                type="tel">
+            </div>
+          </div>
             <!-- Documentation Section -->
             <div class="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
               <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-2">Documentación Requerida (PDF)</p>
@@ -159,14 +176,18 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
       <!-- Sticky Footer Actions & Navigation -->
       <footer class="sticky bottom-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-t-[3rem] shadow-[0_-15px_40px_rgba(0,0,0,0.1)] px-6 py-6 pb-12 z-[100] max-w-md mx-auto w-full">
-        <button (click)="submit()" class="w-full bg-secondary hover:bg-yellow-400 text-primary font-black text-lg py-5 rounded-2xl shadow-xl shadow-secondary/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest">
+        <button 
+          (click)="submit()" 
+          [disabled]="form.invalid || !files().semanas || !files().vigencia || isLoading()"
+          class="w-full bg-secondary hover:bg-yellow-400 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed text-primary font-black text-lg py-5 rounded-2xl shadow-xl shadow-secondary/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest">
+          
           @if (isLoading()) {
-          <span class="material-symbols-outlined animate-spin">progress_activity</span>
-          <span>Procesando...</span>
-        } @else {
-          <span>Registrar Cliente</span>
-          <span class="material-symbols-outlined font-black">arrow_forward</span>
-        }
+            <span class="material-symbols-outlined animate-spin">progress_activity</span>
+            <span>Procesando...</span>
+          } @else {
+            <span>Registrar Cliente</span>
+            <span class="material-symbols-outlined font-black">arrow_forward</span>
+          }
         </button>
 
         <nav class="mt-8 flex justify-around items-center">
