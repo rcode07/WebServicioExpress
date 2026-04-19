@@ -13,6 +13,7 @@ export const EndPoints = {
     },
     user: {
         login: `${environment.apiBaseUrl}/User/login`,
+        ping: `${environment.apiBaseUrl}/User/ping`
     },
     service: {
         getById : `${environment.apiBaseUrl}/Service/historical`,

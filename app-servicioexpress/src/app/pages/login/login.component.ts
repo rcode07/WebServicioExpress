@@ -135,9 +135,21 @@ export class LoginComponent {
   form : any;
 
   ngOnInit(): void {
+    
     this.form = this.fb.group({
       userName: ['', [Validators.required, Validators.minLength(10)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
+    });
+    this.isLoading.set(true);
+    this.auth.ping().subscribe({
+      next: () => {
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        console.error('ping failed', err);
+        alert('No se pudo conectar con el servidor. Por favor, intenta nuevamente más tarde.');
+      }
     });
   }
 
