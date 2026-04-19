@@ -14,6 +14,10 @@ export class AuthService {
     return this.http.post<any>(EndPoints.user.login, credentials);
   }
 
+  ping(): Observable<string>{
+    return this.http.get<string>(EndPoints.user.ping);
+  }
+
   storeToken(name: string, value: string){
       localStorage.setItem(name, value);
   }
