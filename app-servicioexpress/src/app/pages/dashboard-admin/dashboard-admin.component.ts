@@ -46,28 +46,17 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
           </div>
         </div>
 
-        <button class="w-full bg-[#135bec] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#135bec33]" (click)="getFile()">
-          <span class="material-symbols-outlined">download</span>
-          Exportar Reporte
-        </button>
-
-        <!-- <div class="grid grid-cols-2 gap-3">
-          @for (stat of stats(); track stat.label) {
-            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{stat.label}}</p>
-              <p [class]="'text-2xl font-bold mt-1 ' + stat.color">{{stat.value}}</p>
-              <div class="mt-2 flex items-center text-xs text-slate-400">
-                @if (stat.change) {
-                  <span class="flex items-center text-green-600 font-medium">
-                    <span class="material-symbols-outlined text-xs mr-1">trending_up</span> {{stat.change}}
-                  </span>
-                } @else {
-                  {{stat.sub}}
-                }
-              </div>
-            </div>
-          }
-        </div> -->
+        <div class="flex gap-3">
+          <button class="flex-1 bg-white border border-slate-200 text-slate-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all" (click)="getFile()">
+            <span class="material-symbols-outlined text-xl">download</span>
+            <span class="text-sm">Reporte</span>
+          </button>
+          
+          <button class="flex-[1.5] bg-[#135bec] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#135bec33] active:scale-95 transition-all" (click)="goToCreateUser()">
+            <span class="material-symbols-outlined text-xl">person_add</span>
+            <span class="text-sm">Nuevo Usuario</span>
+          </button>
+        </div>
 
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
           @for (tab of tabs(); track tab; let i = $index) {
@@ -119,12 +108,6 @@ import { BottomNavComponent } from '../../components/bottom-nav/bottom-nav.compo
                 </div>
                 <div class="mt-2 flex justify-between items-center">
                   <span class="text-[10px] text-slate-400 italic">Fecha: {{item.fechaActualizacion}}</span>
-                  <!-- <a 
-                    routerLink="/client-edit"
-                    class="text-[#135bec] text-xs font-bold flex items-center"
-                  >
-                    Detalles <span class="material-symbols-outlined text-sm ml-0.5">chevron_right</span>
-                  </a> -->
                 </div>
               </div>
             }
@@ -202,6 +185,10 @@ export class DashboardAdminComponent {
         console.error(err);
       }
     });
+  }
+
+  goToCreateUser() {
+    this.router.navigate(['/consultant-create']);
   }
 
   getStatusClass(status: string) {

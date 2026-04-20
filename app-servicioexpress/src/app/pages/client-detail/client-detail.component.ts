@@ -275,6 +275,7 @@ export class ClientDetailComponent {
         this.isLoading.set(false);
         if(response.message){
           alert('Ticket de pago enviado correctamente');
+          this.back();
         }
       },
       error: (err) => {
