@@ -24,5 +24,8 @@ export const EndPoints = {
     },
     status: {
         getAll: `${environment.apiBaseUrl}/StatusService`,
+    },
+    supplier: {
+        getAll: `${environment.apiBaseUrl}/Supplier`
     }
 };
