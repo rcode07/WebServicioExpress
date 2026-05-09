@@ -7,6 +7,7 @@ import { StatusserviceService } from '../../core/services/statusservice.service'
 import { ClientUpdateRequest } from '../../models/ClientUpdateRequest';
 import { FormBuilder, ɵInternalFormsSharedModule } from "@angular/forms";
 import { ServiceService } from '../../core/services/service.service';
+import { SupplierService } from '../../core/services/supplier.service';
 
 @Component({
   selector: 'app-client-edit',
@@ -101,10 +102,17 @@ import { ServiceService } from '../../core/services/service.service';
             </div>
 
             @if(customer()?.asesor && customer()?.statusService == "PENDIENTE") {
+              <select>
+                <option value="" disabled selected>Selecciona el proveedor</option>
+                <option *ngFor="let status of supplierOptions()" [value]="status.id" (click)="onSupplierChange($event)">{{ status.name }}</option>
+              </select>
+
               <button (click)="saveToInProcess()" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20">
                 <span class="material-symbols-outlined">person</span>
                 <span>Preparar para enviar a proveedor</span>
               </button>
+
+              
             }
 
             @if (customer()?.asesor && customer()?.statusService == "EN PROCESO CON PROVEEDOR") {
@@ -246,7 +254,10 @@ export class ClientEditComponent {
   statusOptions = signal<{id: number, name: string}[]>([]);
   selectedStatusId = signal<number | null>(null);
 
-  constructor(private route: ActivatedRoute, private router: Router, private customerService: CustomerService, private statusService: StatusserviceService, private serviceService: ServiceService) {}
+  supplierOptions = signal<{id: number, name: string}[]>([]);
+  selectedSupplierId = signal<number | null>(null);
+
+  constructor(private route: ActivatedRoute, private router: Router, private customerService: CustomerService, private statusService: StatusserviceService, private serviceService: ServiceService, private supplierService: SupplierService) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -260,13 +271,27 @@ export class ClientEditComponent {
     this.statusService.getAll().subscribe({
       next: (res) => {
         if(res.message && res.object){
+          
           this.statusOptions.set(res.object);
+          
           this.customerService.getCustomerById(id).subscribe({
             next: (res) => {
               if(res.message && res.object){
                 const customerData = res.object as CustomerServiceModel;
                 this.customer.set(customerData);
                 this.selectedStatusId.set(customerData.idStatusService);
+
+                this.supplierService.getAll().subscribe({
+                  next: (res) => {
+                    if(res.message && res.object){
+                      this.supplierOptions.set(res.object);
+                    } else {
+                      alert('Error al cargar los proveedores, por favor intente nuevamente');
+                      this.back();
+                    }
+                  }
+                });
+
               }
             },
             error: (err) => {
@@ -282,11 +307,15 @@ export class ClientEditComponent {
         this.back();
       }
     });
+
+
   }
 
   saveToInProcess() {
     const statusInProcess = this.statusOptions().find(status => status.name.toUpperCase() === 'EN PROCESO');
     const statusId = statusInProcess ? statusInProcess.id : null;
+
+    const supplier = this.supplierOptions().find(supplier => supplier.id === this.selectedSupplierId());
 
     const currentCustomer: ClientUpdateRequest = {
       id: this.customer()?.id || 0,
@@ -295,7 +324,8 @@ export class ClientEditComponent {
       curp: this.customer()?.curp || '',
       phone: this.customer()?.phone || '',
       IdService: this.customer()?.idService || 0,
-      IdStatusService: statusId || 0
+      IdStatusService: statusId || 0,
+      IdSupplier: supplier ? supplier.id : 0
     };
     this.saveChangeCustomer(currentCustomer);
   }
@@ -423,6 +453,11 @@ export class ClientEditComponent {
   onStatusChange(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     this.selectedStatusId.set(Number(value));
+  }
+
+  onSupplierChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedSupplierId.set(Number(value));
   }
 
   back() {
