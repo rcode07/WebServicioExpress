@@ -17,7 +17,7 @@ export class AuthService {
   }
 
   createConsultant(consultant: ConsultantModel): Observable<any>{
-    return this.http.post<ResponseApiGeneric>(EndPoints.user.createConsultant, consultant);
+    return this.http.post<ResponseApiGeneric>(EndPoints.user.consultant, consultant);
   }
 
   ping(): Observable<string>{
@@ -30,5 +30,9 @@ export class AuthService {
 
   clearTokens(name: string){
     localStorage.removeItem(name);
+  }
+
+  getConsultants(): Observable<any>{
+    return this.http.get<ResponseApiGeneric>(EndPoints.user.consultant);
   }
 }

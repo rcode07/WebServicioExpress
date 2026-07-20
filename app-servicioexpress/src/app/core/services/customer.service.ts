@@ -20,11 +20,13 @@ export class CustomerService {
     return this.http.get<ResponseApiGeneric>(EndPoints.customer.getResume + "?idConsultant=" + idConsultant);
   }
 
-  create(idConsultant: string, nss: string, curp : string, phone: string, name: string, file1 : File, file2: File){
+  create(idConsultant: string, nss: string, curp : string, phone: string, name: string, file1 : File, file2?: File | null){
     const formData = new FormData();
 
     formData.append('file1', file1);
-    formData.append('file2', file2);
+    if (file2) {
+      formData.append('file2', file2);
+    }
     formData.append('idConsultant', idConsultant);
     formData.append('Customer.nss', nss);
     formData.append('Customer.curp', curp);
