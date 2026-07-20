@@ -3,11 +3,15 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../core/services/customer.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AsesorModel } from '../../models/AsesorModel';
+import { ResponseApiGeneric } from '../../models/ResponseApiGeneric';
+import { AuthService } from '../../core/services/auth.service';
+import { FormsModule } from '@angular/forms'; // 1. Import FormsModule
 
 @Component({
   selector: 'app-client-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
     <div class="flex flex-col min-h-screen bg-background-light dark:bg-background-dark animate-fade-in relative">
       <!-- Header -->
@@ -37,6 +41,59 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
       <main class="flex-1 px-6 -mt-6 relative z-20 pb-4 overflow-y-auto">
         <form [formGroup] = "form" class="space-y-4" (submit)="$event.preventDefault(); submit()">
           <div class="bg-white dark:bg-slate-800 p-6 rounded-[2.5rem] shadow-xl space-y-5 border border-white dark:border-slate-700">
+
+            @if (role() == 'SECRETARIA') {
+              <!-- <div class="space-y-1.5">
+                <div class="flex justify-between items-end px-2">
+                  <select id="consultantSelect" [(ngModel)]="selectedConsultantId" class="form-control">
+                    <option [ngValue]="null" disabled selected>-- Selecciona una opción --</option>
+                    
+                    <option *ngFor="let consultant of consultantList" [value]="consultant.id">
+                      {{ consultant.name }}
+                    </option>
+                  </select>
+                </div>
+              </div> -->
+
+              <div class="space-y-1.5">
+                <!-- Label superior -->
+                <div class="flex justify-between items-end px-2">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest" for="consultantSelect">
+                    Asesor
+                  </label>
+                </div>
+
+                <!-- Contenedor relativo para iconos y select -->
+                <div class="relative group">
+                  <!-- Icono izquierdo de Asesor -->
+                  <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none z-10">
+                    support_agent
+                  </span>
+
+                  <!-- Select Estilizado -->
+                  <select 
+                    id="consultantSelect" 
+                    [(ngModel)]="selectedConsultantId" 
+                    [ngModelOptions]="{standalone: true}"
+                    class="w-full pl-12 pr-10 py-4 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-slate-800 dark:text-white transition-all outline-none text-sm font-medium appearance-none cursor-pointer">
+                    
+                    <option [ngValue]="null" disabled selected>-- Selecciona un asesor --</option>
+
+                    <option 
+                      *ngFor="let consultant of consultantList" 
+                      [value]="consultant.id"
+                      class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white py-2">
+                      {{ consultant.name }}
+                    </option>
+                  </select>
+
+                  <!-- Icono de flecha desplegable a la derecha -->
+                  <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-transform group-focus-within:rotate-180">
+                    expand_more
+                  </span>
+                </div>
+              </div>
+            }
             
             <!-- NSS Input -->
             <div class="space-y-1.5">
@@ -178,7 +235,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
       <footer class="sticky bottom-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-t-[3rem] shadow-[0_-15px_40px_rgba(0,0,0,0.1)] px-6 py-6 pb-12 z-[100] max-w-md mx-auto w-full">
         <button 
           (click)="submit()" 
-          [disabled]="form.invalid || !files().semanas || !files().vigencia || isLoading()"
+          [disabled]="form.invalid || !files().semanas || isLoading()"
           class="w-full bg-secondary hover:bg-yellow-400 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed text-primary font-black text-lg py-5 rounded-2xl shadow-xl shadow-secondary/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest">
           
           @if (isLoading()) {
@@ -243,6 +300,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 export class ClientRegisterComponent {
 
   isLoading = signal(false);
+  role = signal(localStorage.getItem('user_role'));
+  consultantList: AsesorModel[] = [];
+  selectedConsultantId : number | null = null;
 
   // Estado de los archivos subidos usando Signals
   files = signal<{ semanas: File | null; vigencia: File | null }>({
@@ -253,35 +313,57 @@ export class ClientRegisterComponent {
   formBuilder = new FormBuilder();
   form : any;
 
-  constructor(private router: Router, private service: CustomerService, private fb: FormBuilder) {}
+  constructor(private router: Router, private service: CustomerService, private fb: FormBuilder, private authService: AuthService) {}
   
   back(): void {
     this.router.navigate(['/dashboard']);
   }
 
   onFileSelected(event: any, type: 'semanas' | 'vigencia'): void {
-  const file = event.target.files[0];
+    const file = event.target.files[0];
 
-  if (file) {
-    this.files.update(current => ({
-      ...current,
-      [type]: file
-    }));
+    if (file) {
+      this.files.update(current => ({
+        ...current,
+        [type]: file
+      }));
+    }
   }
-}
 
-ngOnInit(): void{
-  this.form = this.fb.group({
-    nss: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
-    curp: ['', [Validators.required, Validators.minLength(18), Validators.maxLength(18)]],
-    phone: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
-    name: ['', [Validators.required]],
-  });
-}
+  ngOnInit(): void{
+    this.form = this.fb.group({
+      nss: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+      curp: ['', [Validators.required, Validators.minLength(18), Validators.maxLength(18)]],
+      phone: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
+      name: ['', [Validators.required]],
+    });
+    this.getConsultans();
+  }
 
-  
+  getConsultans() : void {
+    this.authService.getConsultants().subscribe({
+      next: (res: ResponseApiGeneric) => {
+        this.consultantList = res.object;
+      },
+      error: (err) => {
+        console.error('Error fetching consultants:', err);
+        alert('Error al obtener la lista de consultores. Por favor, inténtalo de nuevo más tarde.');
+      }
+    });
+  }
+
   submit(): void {
-    const idConsultant = localStorage.getItem('user_id');
+    if(this.role() === 'SECRETARIA' && !this.selectedConsultantId){
+      alert("Por favor, selecciona un asesor antes de continuar.");
+      return;
+    }
+    var idConsultant : any | null = null;
+
+    if(this.role() === 'SECRETARIA'){
+      idConsultant = this.selectedConsultantId;
+    }else{
+      idConsultant = localStorage.getItem('user_id');
+    }
 
     if(idConsultant == null){
       alert("Error, cierre sesión y vuelva a entrar");
@@ -302,8 +384,8 @@ ngOnInit(): void{
 
     const filesValue = this.files();
 
-    if (!filesValue.semanas || !filesValue.vigencia) {
-      console.error('Faltan archivos');
+    if (!filesValue.semanas) {
+      console.error('Falta al menos un archivo: Semanas Cotizadas');
       return;
     }
 

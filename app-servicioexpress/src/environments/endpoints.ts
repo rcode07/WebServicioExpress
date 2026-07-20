@@ -14,7 +14,7 @@ export const EndPoints = {
     user: {
         login: `${environment.apiBaseUrl}/User/login`,
         ping: `${environment.apiBaseUrl}/User/ping`,
-        createConsultant: `${environment.apiBaseUrl}/User/Consultant`
+        consultant: `${environment.apiBaseUrl}/User/Consultant`
     },
     service: {
         getById : `${environment.apiBaseUrl}/Service/historical`,

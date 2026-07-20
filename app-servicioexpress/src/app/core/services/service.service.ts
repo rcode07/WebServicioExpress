@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { EndPoints } from '../../../environments/endpoints';
 import { ResponseApiGeneric } from '../../models/ResponseApiGeneric';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
